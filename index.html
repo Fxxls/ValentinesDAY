@@ -1,163 +1,592 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Valentines Day</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .gradient-background {
-      position: absolute; /* Ensure it's behind content */
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('./img/kawaii-hearts.gif'), /* GIF first */
-                        linear-gradient(180deg, rgba(255, 182, 193, 0.7) 0%, rgba(255, 255, 255, 0.8) 100%); /* Pink to white gradient */
-      background-size: cover; /* Ensures the GIF covers the whole screen */
-      background-position: center; /* Centers the GIF */
-      background-attachment: fixed; /* Keeps the background fixed during scrolling */
-      z-index: -1; /* Ensure the background is behind other content */
-    }
-
-    .bounce2 {
-      animation: bounce2 2s ease infinite;
-    }
-
-    @keyframes bounce2 {
-      0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-      }
-      40% {
-        transform: translateY(-20px);
-      }
-      60% {
-        transform: translateY(-10px);
-      }
-    }
-
-    /* Smooth transition for button movement */
-    #noButton {
-      transition: all 0.5s ease;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Pad Lock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f5d9e8, #e1f5e8);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+        
+        .number-pad-container {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .number-pad {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .display {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 28px;
+            border: 2px solid #c8e6c9;
+            border-radius: 12px;
+            background: #fff;
+            outline: none;
+            font-family: 'Poppins', sans-serif;
+            color: #555;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        button {
+            width: 70px;
+            height: 70px;
+            font-size: 24px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: #FDCCDD;
+            border: none;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:hover::after {
+            opacity: 1;
+        }
+        
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .num-btn:nth-child(odd) {
+            background: #FDCCDD;
+        }
+        
+        .num-btn:nth-child(even) {
+            background: #a8e6cf;
+        }
+        
+        #clear {
+            background: #FFB6C1;
+        }
+        
+        #enter {
+            background: #a8e6cf;
+        }
+        
+        .message {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-family: 'Poppins', sans-serif;
+            color: #555;
+        }
+        
+        .success-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5d9e8, #e1f5e8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .message-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+            border: 2px solid #FDCCDD;
+            margin-bottom: 20px;
+        }
+        
+        .message-box h1 {
+            font-family: 'Dancing Script', cursive;
+            color: #FDCCDD;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        .message-box p {
+            font-family: 'Poppins', sans-serif;
+            color: #666;
+            line-height: 1.6;
+            font-size: 18px;
+        }
+        
+        .ribbon {
+            position: absolute;
+            font-size: 40px;
+            z-index: 1;
+            animation: float 8s infinite ease-in-out;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        .gallery-btn {
+            position: fixed;
+            bottom: 30px;
+            background: white;
+            border: 2px solid #FDCCDD;
+            color: #FDCCDD;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 200px;
+        }
+        
+        .gallery-btn:hover {
+            background: #FDCCDD;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .gallery-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5d9e8, #e1f5e8);
+            z-index: 200;
+            padding: 40px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+            margin-top: 80px;
+        }
+        
+        .closing-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #a8e6cf;
+            color: #a8e6cf;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 202;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+        }
+        
+        .closing-btn:hover {
+            background: #a8e6cf;
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .gallery-item {
+            background: white;
+            border-radius: 5px;
+            padding: 20px 20px 60px 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: rotate(1deg);
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:nth-child(even) {
+            transform: rotate(-1deg);
+        }
+        
+        .gallery-item:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+        
+        .gallery-item::after {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            height: 25px;
+            background: rgba(0,0,0,0.1);
+            filter: blur(8px);
+            z-index: -1;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 280px;
+            object-fit: contain;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            background: #f8f8f8;
+        }
+        
+        .gallery-item .placeholder {
+            color: #aaa;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            margin: auto 0;
+            padding: 20px;
+        }
+        
+        .gallery-item .caption {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            color: #666;
+            font-size: 22px;
+            padding: 0 15px;
+        }
+        
+        .closing-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5d9e8, #e1f5e8);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .closing-message {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 2px solid #FDCCDD;
+            font-family: 'Dancing Script', cursive;
+            color: #666;
+            font-size: 24px;
+            line-height: 1.6;
+        }
+        
+        .closing-date {
+            margin-top: 30px;
+            font-size: 28px;
+            color: #FDCCDD;
+            font-weight: bold;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: 2px solid #FDCCDD;
+            color: #FDCCDD;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 201;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-btn:hover {
+            background: #FDCCDD;
+            color: white;
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
-<body class="gradient-background">
-  <div class="flex items-center justify-center h-screen">
-    <div class="flex flex-col items-center p-4">
-      <img id="imageDisplay" src="./img/image1.gif" alt="Cute kitten with flowers" class="rounded-md h-[300px]" style="object-fit: cover;" />
-      <h2 id="valentineQuestion" class="text-4xl font-bold italic text-[#bd1e59] my-4">Will you be my Valentine?</h2>
-      <div class="flex gap-4 pt-[20px] items-center" id="responseButtons">
-        <button id="yesButton"
-          class="bounce2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-[20px] font-medium disabled:pointer-events-none disabled:opacity-50 hover:bg-green-400 min-h-12 min-w-[75px] px-4 py-2 bg-green-500 text-white transition">
-          Yes
-        </button>
-        <button id="noButton"
-          class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-[20px] font-medium transition disabled:pointer-events-none disabled:opacity-50 hover:bg-red-700 h-12 min-w-[75px] w-auto px-4 py-2 bg-red-500 text-white">
-          No
-        </button>
-      </div>
+<body>
+    <div class="number-pad-container">
+        <div class="number-pad">
+            <input type="text" class="display" id="display" readonly>
+            <div class="buttons">
+                <button class="num-btn" onclick="addNumber('1')">1</button>
+                <button class="num-btn" onclick="addNumber('2')">2</button>
+                <button class="num-btn" onclick="addNumber('3')">3</button>
+                <button class="num-btn" onclick="addNumber('4')">4</button>
+                <button class="num-btn" onclick="addNumber('5')">5</button>
+                <button class="num-btn" onclick="addNumber('6')">6</button>
+                <button class="num-btn" onclick="addNumber('7')">7</button>
+                <button class="num-btn" onclick="addNumber('8')">8</button>
+                <button class="num-btn" onclick="addNumber('9')">9</button>
+                <button id="clear" onclick="clearDisplay()">C</button>
+                <button class="num-btn" onclick="addNumber('0')">0</button>
+                <button id="enter" onclick="checkPassword()">✓</button>
+            </div>
+            <div class="message" id="message"></div>
+        </div>
     </div>
-  </div>
 
-  <script type="module">
-    import confetti from 'https://cdn.skypack.dev/canvas-confetti';
-    const yesButton = document.getElementById('yesButton');
-    const noButton = document.getElementById('noButton');
-    const imageDisplay = document.getElementById('imageDisplay');
-    const valentineQuestion = document.getElementById('valentineQuestion');
-    const responseButtons = document.getElementById('responseButtons');
-  
-    let noClickCount = 0;
-    let buttonHeight = 48; // Starting height in pixels
-    let buttonWidth = 80;
-    let fontSize = 20; // Starting font size in pixels
-    const imagePaths = [
-      "./img/image1.gif",
-      "./img/image2.gif",
-      "./img/image3.gif",
-      "./img/image4.gif",
-      "./img/image5.gif",
-      "./img/image6.gif",
-      "./img/image7.gif"
-    ];
-  
-    function moveButton() {
-      const x = Math.random() * (window.innerWidth - noButton.offsetWidth);
-      const y = Math.random() * (window.innerHeight - noButton.offsetHeight);
-      noButton.style.left = `${x}px`;
-      noButton.style.top = `${y}px`;
-    }
-  
-    noButton.addEventListener('click', function() {
-      if (noClickCount < 5) {
-        noClickCount++;
-        imageDisplay.src = imagePaths[noClickCount];
-        if (noClickCount < 5) {
-          buttonHeight += 35; // Increase height by 5px on each click
-          buttonWidth += 35;
-          fontSize += 25; // Increase font size by 1px on each click
-          yesButton.style.height = `${buttonHeight}px`; // Update button height
-          yesButton.style.width = `${buttonWidth}px`;
-          yesButton.style.fontSize = `${fontSize}px`; // Update font size
+    <div class="success-page" id="successPage">
+        <div class="message-box">
+            <h1>Our Story Begins</h1>
+            <p>The time we've spent together so far has been nothing short of amazing. This next page isn't just a collection of pictures—it's a glimpse into the foundation of something truly special. These moments are the building blocks of what we'll create together, and I can't wait to fill the pages of our story with even more lifelong memories.</p>
+        </div>
+        <button class="gallery-btn" id="galleryBtn">View Our Gallery</button>
+    </div>
+
+    <div class="gallery-page" id="galleryPage">
+        <button class="back-btn" id="backBtn">← Back</button>
+        <button class="closing-btn" id="closingBtn">Special Message</button>
+        <div class="gallery-container">
+            <div class="gallery-item">
+                <img src="/img/image1.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                <div class="placeholder" style="display:none">Image 1 - Replace with /img/image1.jpg</div>
+                <div class="caption">The day I knew</div>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/image2.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                <div class="placeholder" style="display:none">Image 2 - Replace with /img/image2.jpg</div>
+                <div class="caption">No Other Heart</div>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/image3.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                <div class="placeholder" style="display:none">Image 3 - Replace with /img/image3.jpg</div>
+                <div class="caption">mafu x kim</div>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/image4.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                <div class="placeholder" style="display:none">Image 4 - Replace with /img/image4.jpg</div>
+                <div class="caption">Sparks</div>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/image5.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                <div class="placeholder" style="display:none">Image 5 - Replace with /img/image5.jpg</div>
+                <div class="caption">Glue Song</div>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/image6.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                <div class="placeholder" style="display:none">Image 6 - Replace with /img/image6.jpg</div>
+                <div class="caption">Those Eyes</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="closing-page" id="closingPage">
+        <button class="back-btn" onclick="document.getElementById('closingPage').style.display='none';document.getElementById('galleryPage').style.display='flex'">← Back</button>
+        <div class="closing-message">
+            Kim, I feel so lucky to have such a smart and beautiful girl in my life. 
+            I often find myself looking at you, just to lose myself in your eyes. 
+            Your soft lips send a warm shockwave through me with every kiss. 
+            You are the most amazing person I've ever known, and I can't wait to 
+            spend more time with you. Every second with you is precious to me.
+            <div class="closing-date">To our future together 3/29/25</div>
+        </div>
+    </div>
+
+    <script>
+        const correctPassword = "11525";
+        let currentInput = "";
+
+        function addNumber(num) {
+            if (currentInput.length < 5) {
+                currentInput += num;
+                document.getElementById("display").value = currentInput;
+            }
         }
-        if (noClickCount < 6) {
-          noButton.textContent = ["No", " Wait are you sure?", "Wait please :(", "Don't do this to me :(", "I'm gonna cry...", "Balling my eyes out right now! :'("][noClickCount];
+
+        function clearDisplay() {
+            currentInput = "";
+            document.getElementById("display").value = "";
+            document.getElementById("message").textContent = "";
         }
-      } else if (noClickCount === 5) {
-        noClickCount++;
-        // Set the button to absolute positioning and its initial position
-        noButton.style.position = 'absolute';
-        const rect = noButton.getBoundingClientRect();
-        noButton.style.left = `${rect.left}px`;
-        noButton.style.top = `${rect.top}px`;
-        // Force a reflow to ensure the transition works
-        noButton.offsetHeight;
-        // Move the button to a new random position
-        moveButton();
-        // Change the text when the button starts moving
-        noButton.textContent = "You can't say no, if you can't catch me. :(";
-      } else if (noClickCount > 5) {
-        moveButton(); // Move the button on subsequent clicks
-      }
-    });
-  
-    yesButton.addEventListener('click', () => {
-      imageDisplay.src = './img/image7.gif'; // Change to image7.gif
-      valentineQuestion.textContent = "Yayyy!! <3"; // Change the question text
-      responseButtons.style.display = 'none'; // Hide both buttons
-  
-      // Custom confetti with heart shapes
-      confetti({
-        particleCount: 150, // Number of hearts
-        spread: 360, // Spread across the entire screen
-        origin: { y: 0.6 }, // Start from the middle vertically
-        shapes: ['heart'], // Use heart shapes
-        scalar: 2, // Increase the size of the hearts
-        colors: ['#ff007f', '#ff1493', '#ff69b4', '#ff85a2'], // Pink and red colors
-      });
-  
-      // Add more confetti for a fuller effect
-      setTimeout(() => {
-        confetti({
-          particleCount: 100,
-          spread: 360,
-          origin: { y: 0.4 },
-          shapes: ['heart'],
-          scalar: 2,
-          colors: ['#ff007f', '#ff1493', '#ff69b4', '#ff85a2'],
+
+        function checkPassword() {
+            if (currentInput === correctPassword) {
+                document.getElementById("message").textContent = "Access Granted!";
+                document.getElementById("message").style.color = "#a8e6cf";
+                
+                setTimeout(() => {
+                    document.querySelector('.number-pad-container').style.display = 'none';
+                    document.getElementById('successPage').style.display = 'flex';
+                    createDecorativeElements();
+                }, 1000);
+            } else {
+                document.getElementById("message").textContent = "Incorrect Password";
+                document.getElementById("message").style.color = "#FFB6C1";
+                setTimeout(clearDisplay, 1000);
+            }
+        }
+
+        function createDecorativeElements() {
+            const successPage = document.getElementById('successPage');
+            const ribbonColors = ['#FDCCDD', '#FFB6C1', '#FFD1DC', '#FF9EB5'];
+            
+            const gridCols = 5;
+            const gridRows = 3;
+            const cellWidth = 100 / gridCols;
+            const cellHeight = 100 / gridRows;
+            
+            for (let row = 0; row < gridRows; row++) {
+                for (let col = 0; col < gridCols; col++) {
+                    if (row === Math.floor(gridRows/2) && col === Math.floor(gridCols/2)) continue;
+                    
+                    const ribbon = document.createElement('div');
+                    ribbon.className = 'ribbon';
+                    ribbon.textContent = '🎀';
+                    
+                    const left = col * cellWidth + cellWidth/2 + (Math.random() * 10 - 5);
+                    const top = row * cellHeight + cellHeight/2 + (Math.random() * 10 - 5);
+                    
+                    const size = 30 + Math.random() * 20;
+                    const duration = 6 + Math.random() * 4;
+                    const delay = Math.random() * 5;
+                    const color = ribbonColors[Math.floor(Math.random() * ribbonColors.length)];
+                    const hueRotate = getHueRotation(color);
+                    
+                    ribbon.style.left = `${left}%`;
+                    ribbon.style.top = `${top}%`;
+                    ribbon.style.fontSize = `${size}px`;
+                    ribbon.style.filter = `drop-shadow(0 2px 4px rgba(0,0,0,0.1)) hue-rotate(${hueRotate}deg)`;
+                    ribbon.style.animationDuration = `${duration}s`;
+                    ribbon.style.animationDelay = `${delay}s`;
+                    
+                    successPage.appendChild(ribbon);
+                }
+            }
+
+            const heartCount = 8;
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'ribbon';
+                heart.textContent = '🤍';
+                
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const size = 20 + Math.random() * 15;
+                const duration = 5 + Math.random() * 5;
+                const delay = Math.random() * 5;
+                
+                heart.style.left = `${left}%`;
+                heart.style.top = `${top}%`;
+                heart.style.fontSize = `${size}px`;
+                heart.style.animationDuration = `${duration}s`;
+                heart.style.animationDelay = `${delay}s`;
+                heart.style.opacity = 0.7 + Math.random() * 0.3;
+                
+                successPage.appendChild(heart);
+            }
+        }
+
+        function getHueRotation(hexColor) {
+            if (hexColor === '#FDCCDD') return 0;
+            if (hexColor === '#FFB6C1') return -15;
+            if (hexColor === '#FFD1DC') return 10;
+            if (hexColor === '#FF9EB5') return -25;
+            return 0;
+        }
+
+        document.getElementById('galleryBtn').addEventListener('click', function() {
+            document.getElementById('successPage').style.display = 'none';
+            document.getElementById('galleryPage').style.display = 'flex';
         });
-      }, 300);
-  
-      setTimeout(() => {
-        confetti({
-          particleCount: 100,
-          spread: 360,
-          origin: { y: 0.8 },
-          shapes: ['heart'],
-          scalar: 2,
-          colors: ['#ff007f', '#ff1493', '#ff69b4', '#ff85a2'],
+
+        document.getElementById('closingBtn').addEventListener('click', function() {
+            document.getElementById('galleryPage').style.display = 'none';
+            document.getElementById('closingPage').style.display = 'flex';
         });
-      }, 600);
-    });
-  </script>
+
+        document.getElementById('backBtn').addEventListener('click', function() {
+            document.getElementById('galleryPage').style.display = 'none';
+            document.getElementById('successPage').style.display = 'flex';
+        });
+
+        // Initialize all pages
+        document.querySelector('.number-pad-container').style.display = 'block';
+        document.getElementById('successPage').style.display = 'none';
+        document.getElementById('galleryPage').style.display = 'none';
+        document.getElementById('closingPage').style.display = 'none';
+    </script>
+</body>
+</html>
