@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Our Love Story</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --container-max-width: 400px;
+            --button-height: 65px;
+            --display-height: 55px;
+            --wave-height: 150px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            min-height: 100svh;
+            margin: 0;
+            padding: 15px;
+            background: #1a1a1a;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            position: relative;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Allow faster, more natural touch interactions on iOS/Android */
+        button { touch-action: manipulation; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        .lock-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            transition: opacity 0.8s ease-out;
+            background: #e0c3fc;
+        }
+        
+        .wave-section {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%; z-index: 1; overflow: hidden;
+        }
+        .wave {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: var(--wave-height);
+            background: linear-gradient(to top, #fbc2eb, #a6c1ee);
+        }
+        .wave span {
+            position: absolute; width: 200vw; height: 200vw; top: -195vw; left: 50%;
+            margin-left: -100vw; background: rgba(255, 255, 255, 1);
+            border-radius: 40%;
+            -webkit-animation: animate-wave 10s linear infinite;
+            animation: animate-wave 10s linear infinite;
+        }
+        .wave span:nth-child(1) { -webkit-animation-duration: 12s; animation-duration: 12s; background: #e0c3fc; opacity: 0.9; border-radius: 43%; }
+        .wave span:nth-child(2) { -webkit-animation-duration: 15s; animation-duration: 15s; background: #fbc2eb; opacity: 0.6; border-radius: 45%; }
+        .wave span:nth-child(3) { -webkit-animation-duration: 10s; animation-duration: 10s; background: #f5d9e8; opacity: 0.3; border-radius: 41%; }
+        @-webkit-keyframes animate-wave { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes animate-wave { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .floating-element { position: fixed; pointer-events: none; z-index: 2; opacity: 0; }
+        .floating-bow { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        
+        @keyframes floatAndFade {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0) scale(0.8);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(var(--x1), var(--y1)) scale(1);
+            }
+            70% {
+                opacity: 1;
+                transform: translate(var(--x2), var(--y2)) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--x3), var(--y3)) scale(0.8);
+            }
+        }
+
+        /* fallback CSS shake animation if Web Animations API isn't available */
+        @keyframes shakeX {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake { animation: shakeX 500ms ease-in-out; }
+
+        .main-container { position: relative; z-index: 3; width: 100%; max-width: var(--container-max-width); }
+        .timer-container, .number-pad-container { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); }
+        .timer-container { border-radius: 25px; padding: 20px; margin-bottom: 25px; text-align: center; }
+        .current-date { color: rgba(255, 255, 255, 0.95); font-size: 14px; font-weight: 600; margin-bottom: 10px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
+        .timer-label { color: rgba(255, 255, 255, 0.9); font-size: 12px; font-weight: 400; margin-bottom: 10px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }
+        .timer-display { color: #fff; font-size: 16px; font-weight: 700; letter-spacing: 1px; line-height: 1.3; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
+        .lock-header { text-align: center; margin-bottom: 25px; }
+        .lock-icon { font-size: 36px; margin-bottom: 10px; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)); }
+        .lock-title { color: #fff; font-size: 24px; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
+        .lock-subtitle { color: rgba(255, 255, 255, 0.8); font-size: 14px; font-weight: 400; }
+        .number-pad-container { border-radius: 30px; padding: 25px; }
+        .display { width: 100%; height: var(--display-height); margin-bottom: 25px; text-align: center; font-size: 26px; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 20px; background: rgba(255, 255, 255, 0.95); outline: none; font-family: 'Poppins', sans-serif; font-weight: 600; color: #333; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1), 0 5px 15px rgba(0, 0, 0, 0.1); letter-spacing: 8px; padding: 0 20px; }
+        .buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        button { width: 100%; height: var(--button-height); font-size: 22px; font-family: 'Poppins', sans-serif; font-weight: 700; border-radius: 20px; cursor: pointer; border: none; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+        button:active { transform: scale(0.95); }
+        .num-btn { background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1)); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); }
+        #clear { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+        #enter { background: linear-gradient(135deg, #51cf66, #40c057); }
+        .message { text-align: center; font-size: 16px; font-weight: 600; color: rgba(255, 255, 255, 0.9); min-height: 25px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+
+        .feature-container { display: none; width: 100%; height: auto; position: absolute; top: 0; left: 0; }
+        .image-holder { height: 100vh; width: 100%; position: sticky; top: 0; z-index: -1; display: flex; justify-content: center; align-items: center; background-color: #1a1a1a; -webkit-overflow-scrolling: touch; }
+        .image-holder img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); transition: transform 0.1s linear, filter 0.1s linear; }
+        .placeholder { color: #555; font-size: 1.5rem; }
+        .content-holder { position: relative; background-color: transparent; margin-top: -100vh; padding-top: 65vh; padding-bottom: 40vh; }
+        .content-text { color: white; padding: 40px; max-width: 800px; margin: 0 auto; text-align: center; line-height: 1.8; font-weight: 500; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7); }
+        .content-text h2 { font-family: 'Dancing Script', cursive; font-size: 5rem; font-weight: 700; margin-bottom: 2rem; color: #fff; }
+        .content-text p { font-size: 1.2rem; }
+
+        .gallery-btn {
+            background-color: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.85);
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+        .gallery-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .gallery-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(20, 20, 30, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .close-gallery-btn {
+            position: absolute;
+            top: 25px; right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            z-index: 201;
+        }
+        .close-gallery-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- IMPROVED POLAROID GALLERY STYLES --- */
+        .polaroid-gallery-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .polaroid-card {
+            width: 100%;
+            max-width: 350px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a0d2e 25%, #16213e 50%, #0f3460 75%, #1a0f2e 100%);
+            padding: 20px;
+            padding-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: visible;
+        }
+        .polaroid-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: 
+                radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 40px 70px, rgba(255,192,203,0.6), transparent),
+                radial-gradient(2px 2px at 90px 40px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255,182,193,0.5), transparent),
+                radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 200px 60px, rgba(255,192,203,0.7), transparent),
+                radial-gradient(2px 2px at 240px 20px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 280px 50px, rgba(255,182,193,0.6), transparent),
+                radial-gradient(2px 2px at 320px 70px, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 60px 120px, rgba(255,192,203,0.8), transparent),
+                radial-gradient(2px 2px at 100px 140px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 180px 160px, rgba(255,182,193,0.7), transparent);
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: 1;
+            animation: starTwinkle 3s ease-in-out infinite alternate;
+        }
+        @keyframes starTwinkle {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        .polaroid-card:hover {
+            transform: scale(1.05) rotate(var(--rotate, 2deg));
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        }
+        .polaroid-image {
+            width: 300px;
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            margin: 0 auto 20px auto;
+            filter: grayscale(0);
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+            /* Heart shape clip-path - bigger and more centered */
+            clip-path: path('M150,280 C90,220 30,170 30,110 C30,50 70,10 120,10 C135,10 150,20 150,35 C150,20 165,10 180,10 C230,10 270,50 270,110 C270,170 210,220 150,280 Z');
+        }
+        .polaroid-caption {
+            font-family: 'Dancing Script', cursive;
+            font-size: 24px;
+            color: rgba(255, 192, 203, 0.95);
+            text-align: center;
+            padding: 8px;
+            margin-top: auto;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 3;
+        }
+
+        /* --- EXPANDED IMAGE VIEW --- */
+        .expanded-image-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+        }
+        .expanded-image-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(255,255,255,0.2);
+        }
+        
+        @media (min-width: 768px) {
+            :root { --container-max-width: 440px; --button-height: 75px; --display-height: 65px; }
+            .content-text p { font-size: 1.5rem; }
+            .content-text h2 { font-size: 6rem; }
+            .polaroid-gallery-wrapper {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 50px;
+            }
+            .polaroid-image {
+                width: 320px;
+                height: 320px;
+                /* Adjusted heart shape for larger screens */
+                clip-path: path('M160,300 C95,235 30,180 30,115 C30,50 75,5 130,5 C145,5 160,15 160,30 C160,15 175,5 190,5 C245,5 290,50 290,115 C290,180 225,235 160,300 Z');
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .polaroid-gallery-wrapper {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 40px;
+                max-width: 1400px;
+            }
+            .polaroid-image {
+                width: 340px;
+                height: 340px;
+                /* Adjusted heart shape for desktop */
+                clip-path: path('M170,320 C100,250 30,190 30,120 C30,50 80,0 140,0 C155,0 170,10 170,25 C170,10 185,0 200,0 C260,0 310,50 310,120 C310,190 240,250 170,320 Z');
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+
+        <div class="lock-screen" id="lockScreen">
+            <section class="wave-section">
+                <div class="wave"><span></span><span></span><span></span></div>
+            </section>
+            <div class="main-container">
+                <div class="timer-container">
+                    <div class="current-date" id="currentDate"></div>
+                    <div class="timer-label">💕 Time Together Since March 29, 2025 💕</div>
+                    <div class="timer-display" id="timerDisplay"></div>
+                </div>
+                <div class="number-pad-container">
+                    <div class="lock-header">
+                        <div class="lock-icon">🔒</div>
+                        <div class="lock-title">Our Love Story</div>
+                        <div class="lock-subtitle">Enter the passcode to continue</div>
+                    </div>
+                    <input type="password" class="display" id="display" readonly>
+                    <div class="buttons">
+                        <button class="num-btn" onclick="addNumber('1')">1</button><button class="num-btn" onclick="addNumber('2')">2</button><button class="num-btn" onclick="addNumber('3')">3</button>
+                        <button class="num-btn" onclick="addNumber('4')">4</button><button class="num-btn" onclick="addNumber('5')">5</button><button class="num-btn" onclick="addNumber('6')">6</button>
+                        <button class="num-btn" onclick="addNumber('7')">7</button><button class="num-btn" onclick="addNumber('8')">8</button><button class="num-btn" onclick="addNumber('9')">9</button>
+                        <button id="clear" onclick="clearDisplay()">C</button><button class="num-btn" onclick="addNumber('0')">0</button><button id="enter" onclick="checkPassword()">✓</button>
+                    </div>
+                    <div class="message" id="message"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-container" id="featurePage">
+            <div class="image-holder">
+                <!-- lazy-load the main header image; onerror will show placeholder -->
+                <img src="/img/image1.jpg" alt="Feature background" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                <div class="placeholder" style="display:none;">Image not found. <br> Please add to /img/image1.jpg</div>
+            </div>
+            <div class="content-holder">
+                <div class="content-text">
+                    <h2>Love.</h2>
+                    <p>Sex is not love. Dating isn't love. Talking all night or giving all your time isn't love. Love isn't measured by how much you endure for someone or how much you sacrifice to keep them happy. Love is choosing someone every day, even when it's hard. It's holding them through their chaos, not because you have to, but because you want to. It's being their calm in the storm and their constant when everything feels uncertain. Love It's someone who calms the storm in your heart, who reminds you of your worth when you've forgotten it. It's someone who stands beside you when the world feels against you. It's in their quiet actions, the way they check on you without being asked, the way they make space for your feelings, the way they remember the smallest details about you. It's in the moments when they choose you not out of convenience, but because you're their priority. Love isn't loud, it's steady, it's patient. It's the soft reassurance that you're not alone no matter what.</p>
+                    <button class="gallery-btn" onclick="openGallery()">View Gallery</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- IMPROVED GALLERY OVERLAY HTML -->
+    <div class="gallery-overlay" id="galleryOverlay" aria-hidden="true">
+        <span class="close-gallery-btn" onclick="closeGallery()">&times;</span>
+        <div class="polaroid-gallery-wrapper">
+            <div class="polaroid-card" style="--rotate: -3deg;" onclick="openExpandedView('/img/image2.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image2.jpg');">
+                    <img src="/img/image2.jpg" alt="Our First Trip" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Our First Trip</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: 2deg;" onclick="openExpandedView('/img/image3.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image3.jpg');">
+                    <img src="/img/image3.jpg" alt="Beach Day" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Beach Day</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: -1deg;" onclick="openExpandedView('/img/image4.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image4.jpg');">
+                    <img src="/img/image4.jpg" alt="That One Concert" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">That One Concert</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: 4deg;" onclick="openExpandedView('/img/image5.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image5.jpg');">
+                    <img src="/img/image5.jpg" alt="Special Moments" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Special Moments</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: -2deg;" onclick="openExpandedView('/img/image6.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image6.jpg');">
+                    <img src="/img/image6.jpg" alt="Our First Hike" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Our First Hike</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: 3deg;" onclick="openExpandedView('/img/image7.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image7.jpg');">
+                    <img src="/img/image7.jpg" alt="Not your favorite picture but sure is mine" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Not your favorite picture but sure is mine</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: -4deg;" onclick="openExpandedView('/img/image4.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image4.jpg');">
+                    <img src="/img/image4.jpg" alt="Our First Vacation" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Our First Vacation</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: 1deg;" onclick="openExpandedView('/img/image9.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image9.jpg');">
+                    <img src="/img/image9.jpg" alt="Two Beautiful Views" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Two Beautiful Views</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: -1deg;" onclick="openExpandedView('/img/image10.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image10.jpg');">
+                    <img src="/img/image10.jpg" alt="Perfect Day With You" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Perfect Day With You</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: 2deg;" onclick="openExpandedView('/img/image11.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image11.jpg');">
+                    <img src="/img/image11.jpg" alt="My Beautiful Girl" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">My Beautiful Girl</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: -3deg;" onclick="openExpandedView('/img/image12.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image12.jpg');">
+                    <img src="/img/image12.jpg" alt="I Love You" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">I Love You</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: 4deg;" onclick="openExpandedView('/img/image3.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image3.jpg');">
+                    <img src="/img/image3.jpg" alt="My Pretty Girl" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">My Pretty Girl</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: -2deg;" onclick="openExpandedView('/img/image2.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image2.jpg');">
+                    <img src="/img/image2.jpg" alt="Amazing Day with You" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Amazing Day with You</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: 3deg;" onclick="openExpandedView('/img/image8.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image8.jpg');">
+                    <img src="/img/image8.jpg" alt="Who is that GIRL" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Who is that GIRL</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: -1deg;" onclick="openExpandedView('/img/image13.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image13.jpg');">
+                    <img src="/img/image13.jpg" alt="Hold me forever" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Hold me forever</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: 2deg;" onclick="openExpandedView('/img/image14.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image14.jpg');">
+                    <img src="/img/image14.jpg" alt="Our First Museum" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Our First Museum</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: -4deg;" onclick="openExpandedView('/img/image16.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image16.jpg');">
+                    <img src="/img/image16.jpg" alt="My two lovelies" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">My two lovelies</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: 1deg;" onclick="openExpandedView('/img/image15.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image15.jpg');">
+                    <img src="/img/image15.jpg" alt="More Beautiful than the art" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">More Beautiful than the art</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: -3deg;" onclick="openExpandedView('/img/image17.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image17.jpg');">
+                    <img src="/img/image17.jpg" alt="Sunny days with you" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Sunny days with you</div>
+            </div>
+
+            <div class="polaroid-card" style="--rotate: 3deg;" onclick="openExpandedView('/img/image18.jpg')">
+                <div class="polaroid-image" style="background-image: url('/img/image18.jpg');">
+                    <img src="/img/image18.jpg" alt="Mwuah Mwuah" loading="lazy" style="display:none;">
+                </div>
+                <div class="polaroid-caption">Mwuah Mwuah</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="expanded-image-overlay" id="expandedImageView" onclick="closeExpandedView(event)">
+        <span class="close-gallery-btn" onclick="closeExpandedView(event)">&times;</span>
+        <!-- prevent clicking the image itself from closing overlay -->
+        <img id="expandedImage" src="" alt="Expanded gallery view" onclick="event.stopPropagation()">
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        const correctPassword = "011525";
+        let currentInput = "";
+
+        // Bow animation logic
+        (function createFloatingElements() {
+            const isDesktop = window.innerWidth > 768;
+            const numBows = isDesktop ? 25 : 15;
+            const container = document.getElementById('lockScreen');
+
+            const startBowAnimation = (bow) => {
+                bow.style.left = `${Math.random() * 100}vw`;
+                bow.style.top = `${Math.random() * 70}vh`;
+                bow.style.fontSize = `${20 + Math.random() * (isDesktop ? 25 : 20)}px`;
+                const duration = 8 + Math.random() * 8;
+                const delay = Math.random() * 2;
+                const travelRange = 40;
+                const x1 = (Math.random() - 0.5) * travelRange, y1 = (Math.random() - 0.5) * travelRange;
+                const x2 = (Math.random() - 0.5) * travelRange, y2 = (Math.random() - 0.5) * travelRange;
+                const x3 = (Math.random() - 0.5) * travelRange, y3 = (Math.random() - 0.5) * travelRange;
+                bow.style.setProperty('--x1', `${x1}px`); bow.style.setProperty('--y1', `${y1}px`);
+                bow.style.setProperty('--x2', `${x2}px`); bow.style.setProperty('--y2', `${y2}px`);
+                bow.style.setProperty('--x3', `${x3}px`); bow.style.setProperty('--y3', `${y3}px`);
+                bow.style.animation = `floatAndFade ${duration}s ${delay}s ease-in-out`;
+            };
+
+            for (let i = 0; i < numBows; i++) {
+                const bow = document.createElement('div');
+                bow.className = 'floating-element floating-bow';
+                bow.innerHTML = '🎀';
+                container.appendChild(bow);
+                bow.addEventListener('animationend', () => {
+                    bow.style.animation = 'none';
+                    setTimeout(() => startBowAnimation(bow), 10);
+                });
+                startBowAnimation(bow);
+            }
+        })();
+        
+        // Timer and Date logic
+        (function initializeClock() {
+            const updateCurrentDate = () => {
+                const el = document.getElementById('currentDate');
+                if (el) el.textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            };
+            const updateTimer = () => {
+                const timerEl = document.getElementById('timerDisplay');
+                if (!timerEl) return;
+                const diff = new Date() - new Date('2025-03-29T00:00:00');
+                if (diff < 0) { timerEl.textContent = 'Counting down...'; return; }
+                const d = Math.floor(diff / 864e5), h = Math.floor(diff % 864e5 / 36e5), m = Math.floor(diff % 36e5 / 6e4), s = Math.floor(diff % 6e4 / 1e3);
+                timerEl.textContent = `${d}d, ${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            };
+            updateCurrentDate(); updateTimer(); setInterval(updateTimer, 1000);
+        })();
+
+        // Numpad logic
+        function addNumber(num) { if (currentInput.length < 6) { currentInput += num; document.getElementById("display").value = '●'.repeat(currentInput.length); } }
+        function clearDisplay() { currentInput = ""; document.getElementById("display").value = ""; document.getElementById("message").textContent = ""; }
+
+        // Password check and page transition
+        function checkPassword() {
+            const messageEl = document.getElementById("message");
+            if (currentInput === correctPassword) {
+                messageEl.textContent = "Access Granted! 💕";
+                messageEl.style.color = "#51cf66";
+                setTimeout(() => {
+                    const lockScreen = document.getElementById('lockScreen');
+                    lockScreen.style.opacity = '0';
+                    document.body.style.overflow = 'auto';
+                    document.getElementById('featurePage').style.display = 'block';
+                    initializeScrollEffect();
+                    setTimeout(() => lockScreen.style.display = 'none', 800);
+                }, 800);
+            } else {
+                messageEl.textContent = "Try Again ❤️";
+                messageEl.style.color = "#ff6b6b";
+
+                // prefer Web Animations API, fallback to CSS shake class
+                const target = document.querySelector('.number-pad-container');
+                if (target && typeof target.animate === 'function') {
+                    target.animate([
+                        { transform: 'translateX(0)' },
+                        { transform: 'translateX(-10px)' },
+                        { transform: 'translateX(10px)' },
+                        { transform: 'translateX(0)' }
+                    ], { duration: 500, easing: 'ease-in-out' });
+                } else if (target) {
+                    target.classList.remove('shake');
+                    // force reflow to restart animation
+                    void target.offsetWidth;
+                    target.classList.add('shake');
+                    setTimeout(() => target.classList.remove('shake'), 600);
+                }
+
+                setTimeout(clearDisplay, 1500);
+            }
+        }
+
+        // Image zoom-out and blur effect on scroll
+        function initializeScrollEffect() {
+            $(window).on('scroll', function(){
+                let fromTop = $(window).scrollTop();
+                let imageHeight = $('.image-holder').height();
+                if (imageHeight <= 0) return;
+                let effectDistance = imageHeight * 0.8;
+                let progress = Math.min(1, fromTop / effectDistance);
+                let scale = 1.1 - (progress * 0.1);
+                let blur = progress * 8;
+                $('.image-holder img').css({ 'transform': 'scale(' + scale + ')', 'filter': 'blur(' + blur + 'px)' });
+            });
+        }
+
+        function openGallery() {
+            const gallery = document.getElementById('galleryOverlay');
+            gallery.style.display = 'flex';
+            gallery.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeGallery() {
+            const gallery = document.getElementById('galleryOverlay');
+            gallery.style.display = 'none';
+            gallery.setAttribute('aria-hidden', 'true');
+        }
+
+        function openExpandedView(imageSrc) {
+            const expandedView = document.getElementById('expandedImageView');
+            const expandedImage = document.getElementById('expandedImage');
+            expandedImage.src = imageSrc;
+            expandedView.style.display = 'flex';
+        }
+
+        function closeExpandedView(event) {
+            if (event && typeof event.stopPropagation === 'function') {
+                event.stopPropagation();
+            }
+            const expandedView = document.getElementById('expandedImageView');
+            if (expandedView) expandedView.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
